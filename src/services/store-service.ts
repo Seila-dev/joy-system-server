@@ -67,6 +67,7 @@ class StoreService {
         if (productData.price !== undefined) updateData.price = productData.price;
         if (productData.featured !== undefined) updateData.featured = productData.featured;
         if (productData.isActive !== undefined) updateData.isActive = productData.isActive;
+        if (productData.userId !== undefined) updateData.userId = productData.userId;
 
         return this.prisma.product.update({
             where: {
