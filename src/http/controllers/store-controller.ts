@@ -119,6 +119,7 @@ export class StoreController {
     async updateProduct(req: Request, res: Response) {
         try {
             const { id } = req.params
+            const userId = req.user.id
             const { name, description, price, featured, isActive } = req.body
 
             const product = await storeService.updateProduct(parseInt(id), {
@@ -126,6 +127,7 @@ export class StoreController {
                 description,
                 price,
                 featured,
+                userId,
                 isActive
             })
 

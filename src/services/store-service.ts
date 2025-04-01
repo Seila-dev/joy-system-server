@@ -58,6 +58,7 @@ class StoreService {
             price?: number;
             featured?: boolean;
             isActive?: boolean;
+            userId: number;
         }
     ) {
         const updateData: any = {};
