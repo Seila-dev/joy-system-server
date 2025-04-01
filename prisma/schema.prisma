@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TimelineCategory {
+  DIARIO
+  SEMANAL
+  MENSAL
+  ANUAL
+}
+
+enum QuestStatus {
+  COMPLETO
+  PENDENTE
+  INCOMPLETO
+  NULO
+}
+
+enum Difficulty {
+  FACIL
+  MEDIO
+  DIFICIL
+  MUITO_DIFICIL
+}
+
+enum JoyTransactionType {
+  GANHO
+  GASTO
+  BONUS
+  PENALIDADE
+  COMPRA
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  username       String
+  passwordHash   String           @map("password_hash")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  quests         Quest[]
+  joys           Joy[]
+  JoyTransaction JoyTransaction[]
+  userProducts   UserProduct[]
+  purchases      Purchase[]
+  product        Product[]
+
+  @@map("users")
+}
+
+model Quest {
+  id             Int              @id @default(autoincrement())
+  title          String
+  description    String
+  validation     DateTime
+  highlight      Boolean
+  status         QuestStatus      @default(NULO)
+  difficulty     Difficulty       @default(MEDIO)
+  joys           Int              @default(0)
+  timeline       TimelineCategory
+  userId         Int              @map("user_id")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  user           User             @relation(fields: [userId], references: [id])
+  JoyTransaction JoyTransaction[]
+
+  @@map("quests")
+}
+
+model Joy {
+  id             Int              @id @default(autoincrement())
+  userId         Int              @map("user_id")
+  currentBalance Int              @default(0)
+  user           User             @relation(fields: [userId], references: [id])
+  transactions   JoyTransaction[]
+
+  @@map("joys")
+}
+
+model JoyTransaction {
+  id          Int                @id @default(autoincrement())
+  userId      Int                @map("user_id")
+  amount      Int
+  type        JoyTransactionType
+  description String
+  createdAt   DateTime           @default(now()) @map("created_at")
+  user        User               @relation(fields: [userId], references: [id])
+  questId     Int?               @map("quest_id")
+  quest       Quest?             @relation(fields: [questId], references: [id])
+  joy         Joy?               @relation(fields: [joyId], references: [id])
+  joyId       Int?               @map("joy_id")
+  purchaseId  Int?               @map("purchase_id")
+  purchase    Purchase?          @relation(fields: [purchaseId], references: [id])
+
+  @@map("joy_transactions")
+}
+
+model Product {
+  id           Int           @id @default(autoincrement())
+  userId       Int           @map("user_id")
+  name         String
+  description  String
+  price        Int
+  featured     Boolean
+  isActive     Boolean       @default(true) @map("is_active")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  purchases    Purchase[]
+  userProducts UserProduct[]
+  user         User          @relation(fields: [userId], references: [id])
+
+  @@map("products")
+}
+
+model Purchase {
+  id             Int              @id @default(autoincrement())
+  userId         Int              @map("user_id")
+  productId      Int              @map("product_id")
+  quantity       Int              @default(1)
+  totalPrice     Int              @map("total_price")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  user           User             @relation(fields: [userId], references: [id])
+  product        Product          @relation(fields: [productId], references: [id])
+  joyTransaction JoyTransaction[]
+
+  @@map("purchases")
+}
+
+model UserProduct {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  productId   Int       @map("product_id")
+  isActive    Boolean   @default(true) @map("is_active")
+  purchasedAt DateTime  @default(now()) @map("purchased_at")
+  expiresAt   DateTime? @map("expires_at")
+  user        User      @relation(fields: [userId], references: [id])
+  product     Product   @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@map("user_products")
+}
