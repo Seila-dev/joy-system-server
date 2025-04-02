@@ -197,6 +197,17 @@ class JoyService {
             }
         })
     }
+
+    async getJoyRewardEstimate(difficulty: Difficulty) {
+        // Check if the provided difficulty is valid
+        if (!Object.keys(DIFFICULTY_JOY_REWARDS).includes(difficulty)) {
+          throw new Error('Invalid difficulty level');
+        }
+        
+        return {
+          joys: DIFFICULTY_JOY_REWARDS[difficulty]
+        };
+      }
 }
 
 export default JoyService

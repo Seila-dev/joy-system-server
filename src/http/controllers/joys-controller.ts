@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import JoyService from "../../services/joys-service"
+import { Difficulty } from "@prisma/client"
 
 const DIFFICULTY_JOY_REWARDS = {
     FACIL: 2,
@@ -118,26 +119,18 @@ export class JoyController {
 
     async getJoyRewardEstimate(req: Request, res: Response) {
         try {
-            const { difficulty } = req.query
+            const difficulty = req.query.difficulty as string
 
-            if (!difficulty || !DIFFICULTY_JOY_REWARDS[difficulty as keyof typeof DIFFICULTY_JOY_REWARDS]) {
-                res.status(400).json({
-                    message: "Invalid difficulty"
-                })
+            if (!difficulty || !['FACIL', 'MEDIO', 'DIFICIL', 'MUITO_DIFICIL'].includes(difficulty)) {
+                res.status(400).json({ error: 'Nível de dificuldade inválido' })
                 return
             }
 
-            const reward = DIFFICULTY_JOY_REWARDS[difficulty as keyof typeof DIFFICULTY_JOY_REWARDS]
-
-            res.status(200).json({
-                message: "Joys rewards got with success",
-                joyReward: reward
-            })
-        } catch (error) {
-            console.error("Error or onbtaining joys reward:", error)
-            res.status(500).json({
-                message: "Server Internal Error"
-            })
+            const joyService = new JoyService()
+            const reward = await joyService.getJoyRewardEstimate(difficulty as Difficulty)
+            res.json(reward)
+        } catch (error: any) {
+            res.status(400).json({ error: error.message })
         }
     }
 
