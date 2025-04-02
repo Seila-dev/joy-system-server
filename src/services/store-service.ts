@@ -24,6 +24,18 @@ class StoreService {
         })
     }
 
+    async getInactiveProducts(userId: number) {
+        return this.prisma.product.findMany({
+            where: {
+                isActive: false,
+                userId: userId
+            },
+            orderBy: {
+                price: 'asc'
+            }
+        })
+    }
+
     async getProductsById(productId: number) {
         return this.prisma.product.findUnique({
             where: {

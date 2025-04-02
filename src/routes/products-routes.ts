@@ -11,6 +11,12 @@ productsRoutes.get(
 )
 
 productsRoutes.get(
+    '/products/inactive', 
+    authMiddleware,
+    new StoreController().getInactiveProducts
+)
+
+productsRoutes.get(
     '/products/:id', 
     authMiddleware,
     new StoreController().getProductById

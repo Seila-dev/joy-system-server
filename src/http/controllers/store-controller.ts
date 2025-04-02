@@ -11,17 +11,34 @@ const storeService = new StoreService()
 export class StoreController {
     async getProducts(req: Request, res: Response) {
         try {
-            
             const userId = req.user.id
-            console.log(userId)
+
             if (!userId) {
                 res.status(400).json({ error: 'User ID and Product ID are required' })
                 return
             }
+
             const products = await storeService.getAllProducts(userId) 
+            
             res.status(200).json(products)
         } catch (error) {
-            console.log('ooii')
+            console.error(error)
+            res.status(500).send(error)
+        }
+    }
+
+    async getInactiveProducts(req: Request, res: Response) {
+        try {
+            const userId = req.user.id
+            
+            if (!userId) {
+                res.status(400).json({ error: 'User ID and Product ID are required' })
+                return
+            
+            }
+            const products = await storeService.getInactiveProducts(userId) 
+            res.status(200).json(products)
+        } catch (error) {
             console.error(error)
             res.status(500).send(error)
         }
