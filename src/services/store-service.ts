@@ -15,19 +15,6 @@ class StoreService {
     async getAllProducts(userId: number) {
         return this.prisma.product.findMany({
             where: {
-                isActive: true,
-                userId: userId
-            },
-            orderBy: {
-                price: 'asc'
-            }
-        })
-    }
-
-    async getInactiveProducts(userId: number) {
-        return this.prisma.product.findMany({
-            where: {
-                isActive: false,
                 userId: userId
             },
             orderBy: {

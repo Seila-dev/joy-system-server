@@ -27,23 +27,6 @@ export class StoreController {
         }
     }
 
-    async getInactiveProducts(req: Request, res: Response) {
-        try {
-            const userId = req.user.id
-            
-            if (!userId) {
-                res.status(400).json({ error: 'User ID and Product ID are required' })
-                return
-            
-            }
-            const products = await storeService.getInactiveProducts(userId) 
-            res.status(200).json(products)
-        } catch (error) {
-            console.error(error)
-            res.status(500).send(error)
-        }
-    }
-
     async getProductById(req: Request, res: Response) {
         try {
             const { id } = req.params
