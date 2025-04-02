@@ -1,6 +1,20 @@
 import { Request, Response } from "express"
 import JoyService from "../../services/joys-service"
 
+const DIFFICULTY_JOY_REWARDS = {
+    FACIL: 2,
+    MEDIO: 4,
+    DIFICIL: 6,
+    MUITO_DIFICIL: 8
+}
+
+const DIFFICULTY_JOY_PENALTIES = {
+    FACIL: -1,
+    MEDIO: -2,
+    DIFICIL: -3,
+    MUITO_DIFICIL: -4
+}
+
 const joyService = new JoyService()
 
 export class JoyController {
@@ -98,6 +112,31 @@ export class JoyController {
 
             res.status(500).json({
                 message: "Erro interno ao recuperar histórico de transações"
+            })
+        }
+    }
+
+    async getJoyRewardEstimate(req: Request, res: Response) {
+        try {
+            const { difficulty } = req.query
+
+            if (!difficulty || !DIFFICULTY_JOY_REWARDS[difficulty as keyof typeof DIFFICULTY_JOY_REWARDS]) {
+                res.status(400).json({
+                    message: "Invalid difficulty"
+                })
+                return
+            }
+
+            const reward = DIFFICULTY_JOY_REWARDS[difficulty as keyof typeof DIFFICULTY_JOY_REWARDS]
+
+            res.status(200).json({
+                message: "Joys rewards got with success",
+                joyReward: reward
+            })
+        } catch (error) {
+            console.error("Error or onbtaining joys reward:", error)
+            res.status(500).json({
+                message: "Server Internal Error"
             })
         }
     }
