@@ -77,6 +77,14 @@ class StoreService {
         })
     }
 
+    async deleteProduct(productId: number) {
+        return this.prisma.product.delete({
+            where: {
+                id: productId
+            }
+        })
+    }
+
     async createPurchase(userId: number, productId: number, quantity: number, totalPrice: number){
         return this.prisma.$transaction(async (tx) => {
             const existingUserProduct = await tx.userProduct.findUnique({
