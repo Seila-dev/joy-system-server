@@ -36,13 +36,16 @@ class JoyService {
                     throw new Error('Quest não encontrada ou não pertence ao usuário')
                 }
 
+                if (quest.status === QuestStatus.COMPLETO || quest.status === QuestStatus.INCOMPLETO) {
+                    throw new Error('Não é possível alterar o status de uma quest já finalizada')
+                }
+
                 const joyReward = DIFFICULTY_JOY_REWARDS[quest.difficulty]
 
                 const updatedQuest = await prisma.quest.update({
                     where: { id: questId },
                     data: {
-                        status: QuestStatus.COMPLETO,
-                        joys: joyReward
+                        status: QuestStatus.COMPLETO
                     }
                 })
 
@@ -85,7 +88,7 @@ class JoyService {
                 }
             })
         } catch (error) {
-            console.error('Erro ao completar quest: ', error)
+            console.error('Error on completing test: ', error)
             throw error
         }
     }
@@ -124,15 +127,16 @@ class JoyService {
                     throw new Error('Quest não encontrada ou não pertence ao usuário')
                 }
 
-                // Calcular penalidade de Joys baseado na dificuldade
+                if (quest.status === QuestStatus.COMPLETO || quest.status === QuestStatus.INCOMPLETO) {
+                    throw new Error('Não é possível alterar o status de uma quest já finalizada')
+                }
+
                 const joyPenalty = DIFFICULTY_JOY_PENALTIES[quest.difficulty]
 
-                // Atualizar status da quest
                 const updatedQuest = await prisma.quest.update({
                     where: { id: questId },
                     data: {
-                        status: QuestStatus.INCOMPLETO,
-                        joys: joyPenalty
+                        status: QuestStatus.INCOMPLETO
                     }
                 })
 
@@ -158,7 +162,6 @@ class JoyService {
                     })
                 }
 
-                // Registrar transação de Joy
                 await prisma.joyTransaction.create({
                     data: {
                         userId,
@@ -173,7 +176,7 @@ class JoyService {
                 return { quest: updatedQuest, joy: userJoy }
             })
         } catch (error) {
-            console.error('Erro ao processar falha na quest:', error)
+            console.error('Error on processing fail on quest:', error)
             throw error
         }
     }
@@ -201,12 +204,12 @@ class JoyService {
     async getJoyRewardEstimate(difficulty: Difficulty) {
         // Check if the provided difficulty is valid
         if (!Object.keys(DIFFICULTY_JOY_REWARDS).includes(difficulty)) {
-          throw new Error('Invalid difficulty level');
+          throw new Error('Invalid difficulty level')
         }
         
         return {
           joys: DIFFICULTY_JOY_REWARDS[difficulty]
-        };
+        }
       }
 }
 

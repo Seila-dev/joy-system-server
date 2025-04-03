@@ -1,7 +1,7 @@
 // MVC - MODEL / VIEW / CONTROLLER
 import { Request, Response } from "express"
 import { prisma } from "../../prisma"
-import { Difficulty } from "@prisma/client";
+import { Difficulty, QuestStatus } from "@prisma/client";
 
 const DIFFICULTY_JOY_REWARDS = {
     FACIL: 2,
@@ -103,6 +103,15 @@ export class QuestsController {
             if (existingQuest.userId !== userId) {
                 response.status(403).send({ message: "Você não tem permissão para editar esta quest" })
                 return
+            }
+
+            if (existingQuest.status === QuestStatus.COMPLETO || existingQuest.status === QuestStatus.INCOMPLETO) {
+                if (status !== existingQuest.status) {
+                    response.status(400).send({ 
+                        message: "Quest já finalizada. Não é possível alterar o status de uma quest completa ou incompleta." 
+                    })
+                    return
+                }
             }
 
             const joys = DIFFICULTY_JOY_REWARDS[difficulty as Difficulty];
