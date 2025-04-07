@@ -7,7 +7,6 @@ export interface CreateNoteType {
   status?: NoteStatus;
   priority?: number;
   color?: string;
-  tags?: string;
   questId?: number;
 }
 
@@ -18,6 +17,5 @@ export interface UpdateNoteType {
   status?: NoteStatus;
   priority?: number;
   color?: string;
-  tags?: string;
   questId?: number | null;
 }

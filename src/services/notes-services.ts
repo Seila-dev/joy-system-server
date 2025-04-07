@@ -5,9 +5,14 @@ const prisma = new PrismaClient();
 
 export class NoteService {
   async createNote(userId: number, data: CreateNoteType): Promise<Note> {
+    const parsedData = {
+        ...data,
+        priority: data.priority !== undefined ?
+        (typeof data.priority === 'string' ? parseInt(data.priority, 10) : data.priority) : 0
+    }
     return prisma.note.create({
       data: {
-        ...data,
+        ...parsedData,
         userId
       }
     });
@@ -42,9 +47,16 @@ export class NoteService {
 
     if (!note) return null;
 
+    const parsedData = {
+        ...data,
+        priority: data.priority !== undefined ? 
+          (typeof data.priority === 'string' ? parseInt(data.priority, 10) : data.priority) : 
+          note.priority 
+      };
+
     return prisma.note.update({
       where: { id },
-      data
+      data: parsedData
     });
   }
 
