@@ -9,10 +9,10 @@ const DIFFICULTY_JOY_REWARDS = {
 }
 
 const DIFFICULTY_JOY_PENALTIES = {
-    FACIL: -1,
-    MEDIO: -2,
-    DIFICIL: -3,
-    MUITO_DIFICIL: -4
+    FACIL: -4,
+    MEDIO: -8,
+    DIFICIL: -12,
+    MUITO_DIFICIL: -16
 }
 
 class JoyService {
