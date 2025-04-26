@@ -73,7 +73,7 @@ class JoyService {
                         userId,
                         amount: joyReward,
                         type: JoyTransactionType.GANHO,
-                        description: `Recompensa por completar quest: ${quest.title}`,
+                        description: `Recompensa por completar tarefa: ${quest.title}`,
                         questId: quest.id,
                         joyId: userJoy.id
                     }
@@ -164,7 +164,7 @@ class JoyService {
                         userId,
                         amount: Math.abs(joyPenalty),
                         type: JoyTransactionType.PENALIDADE,
-                        description: `Penalidade por não completar quest: ${quest.title}`,
+                        description: `Penalidade por não completar tarefa: ${quest.title}`,
                         questId: quest.id,
                         joyId: userJoy.id
                     }

@@ -106,7 +106,7 @@ class StoreService {
                     userId,
                     amount: -totalPrice,
                     type: 'COMPRA',
-                    description: `Purchase of product #${productId}`,
+                    description: `Compra do produto #${productId}`,
                     purchaseId: purchase.id,
                     joyId: (await tx.joy.findFirst({ where: { userId } }))?.id
                 }
