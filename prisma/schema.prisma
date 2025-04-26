@@ -42,6 +42,21 @@ enum JoyTransactionType {
   COMPRA
 }
 
+enum NoteCategory {
+  PESSOAL
+  TRABALHO
+  IDEIAS
+  LEMBRETES
+  METAS
+  OUTRO
+}
+
+enum NoteStatus {
+  ATIVO
+  ARQUIVADO
+  FIXADO
+}
+
 model User {
   id             Int              @id @default(autoincrement())
   email          String           @unique
@@ -55,6 +70,7 @@ model User {
   userProducts   UserProduct[]
   purchases      Purchase[]
   product        Product[]
+  notes          Note[]
 
   @@map("users")
 }
@@ -74,6 +90,7 @@ model Quest {
   updatedAt      DateTime         @updatedAt @map("updated_at")
   user           User             @relation(fields: [userId], references: [id])
   JoyTransaction JoyTransaction[]
+  notes          Note[]
 
   @@map("quests")
 }
@@ -149,4 +166,23 @@ model UserProduct {
 
   @@unique([userId, productId])
   @@map("user_products")
+}
+
+
+model Note {
+  id          Int           @id @default(autoincrement())
+  title       String
+  content     String        @db.Text
+  category    NoteCategory  @default(OUTRO)
+  status      NoteStatus    @default(ATIVO)
+  priority    Int           @default(0) // 0 = baixa, 1 = média, 2 = alta
+  color       String?       
+  userId      Int           @map("user_id")
+  questId     Int?          @map("quest_id")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  user        User          @relation(fields: [userId], references: [id])
+  quest       Quest?        @relation(fields: [questId], references: [id])
+
+  @@map("notes")
 }

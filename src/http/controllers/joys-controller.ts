@@ -1,5 +1,20 @@
 import { Request, Response } from "express"
 import JoyService from "../../services/joys-service"
+import { Difficulty } from "@prisma/client"
+
+const DIFFICULTY_JOY_REWARDS = {
+    FACIL: 2,
+    MEDIO: 4,
+    DIFICIL: 6,
+    MUITO_DIFICIL: 8
+}
+
+const DIFFICULTY_JOY_PENALTIES = {
+    FACIL: -1,
+    MEDIO: -2,
+    DIFICIL: -3,
+    MUITO_DIFICIL: -4
+}
 
 const joyService = new JoyService()
 
@@ -99,6 +114,23 @@ export class JoyController {
             res.status(500).json({
                 message: "Erro interno ao recuperar histórico de transações"
             })
+        }
+    }
+
+    async getJoyRewardEstimate(req: Request, res: Response) {
+        try {
+            const difficulty = req.query.difficulty as string
+
+            if (!difficulty || !['FACIL', 'MEDIO', 'DIFICIL', 'MUITO_DIFICIL'].includes(difficulty)) {
+                res.status(400).json({ error: 'Nível de dificuldade inválido' })
+                return
+            }
+
+            const joyService = new JoyService()
+            const reward = await joyService.getJoyRewardEstimate(difficulty as Difficulty)
+            res.json(reward)
+        } catch (error: any) {
+            res.status(400).json({ error: error.message })
         }
     }
 

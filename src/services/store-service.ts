@@ -15,7 +15,6 @@ class StoreService {
     async getAllProducts(userId: number) {
         return this.prisma.product.findMany({
             where: {
-                isActive: true,
                 userId: userId
             },
             orderBy: {
@@ -74,6 +73,14 @@ class StoreService {
                 id: productId
             },
             data: updateData
+        })
+    }
+
+    async deleteProduct(productId: number) {
+        return this.prisma.product.delete({
+            where: {
+                id: productId
+            }
         })
     }
 

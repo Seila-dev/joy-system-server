@@ -1,6 +1,14 @@
 // MVC - MODEL / VIEW / CONTROLLER
 import { Request, Response } from "express"
 import { prisma } from "../../prisma"
+import { Difficulty, QuestStatus } from "@prisma/client";
+
+const DIFFICULTY_JOY_REWARDS = {
+    FACIL: 2,
+    MEDIO: 4,
+    DIFICIL: 6,
+    MUITO_DIFICIL: 8
+}
 
 export class QuestsController {
 
@@ -23,7 +31,7 @@ export class QuestsController {
 
     async create(request: Request, response: Response) {
         const userId = request.user.id
-        const { title, description, validation, status, difficulty, highlight, timeline, joys } = request.body;
+        const { title, description, validation, status, difficulty, highlight, timeline } = request.body;
 
         try {
         
@@ -39,6 +47,8 @@ export class QuestsController {
                 response.status(400).send({ message: "Dificuldade inválida" });
                 return
             }
+
+            const joys = DIFFICULTY_JOY_REWARDS[difficulty as Difficulty];
 
             const quest = await prisma.quest.create({
                 data: {
@@ -63,7 +73,7 @@ export class QuestsController {
 
     async update(request: Request, response: Response) {
         const userId = request.user.id
-        const { title, description, validation, status, difficulty, highlight, timeline, joys } = request.body;
+        const { title, description, validation, status, difficulty, highlight, timeline } = request.body;
         const { id } = request.params
 
         try {
@@ -94,6 +104,17 @@ export class QuestsController {
                 response.status(403).send({ message: "Você não tem permissão para editar esta quest" })
                 return
             }
+
+            if (existingQuest.status === QuestStatus.COMPLETO || existingQuest.status === QuestStatus.INCOMPLETO) {
+                if (status !== existingQuest.status) {
+                    response.status(400).send({ 
+                        message: "Quest já finalizada. Não é possível alterar o status de uma quest completa ou incompleta." 
+                    })
+                    return
+                }
+            }
+
+            const joys = DIFFICULTY_JOY_REWARDS[difficulty as Difficulty];
 
             const updatedQuest = await prisma.quest.update({
                 where: {

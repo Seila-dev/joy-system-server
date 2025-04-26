@@ -36,4 +36,10 @@ joyRoutes.get(
     new JoyController().getJoyTransactionHistory
 )
 
+joyRoutes.get(
+    "/reward",
+    authMiddleware, 
+    new JoyController().getJoyRewardEstimate
+)
+
 export default joyRoutes

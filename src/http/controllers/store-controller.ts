@@ -11,17 +11,17 @@ const storeService = new StoreService()
 export class StoreController {
     async getProducts(req: Request, res: Response) {
         try {
-            
             const userId = req.user.id
-            console.log(userId)
+
             if (!userId) {
                 res.status(400).json({ error: 'User ID and Product ID are required' })
                 return
             }
+
             const products = await storeService.getAllProducts(userId) 
+            
             res.status(200).json(products)
         } catch (error) {
-            console.log('ooii')
             console.error(error)
             res.status(500).send(error)
         }
@@ -146,12 +146,19 @@ export class StoreController {
     async deleteProduct(req: Request, res: Response) {
         try {
             const { id } = req.params
+            const userId = req.user.id
 
-            const product = await prisma.product.delete({
-                where: {
-                    id: Number(id)
-                }
-            })
+            const product = await storeService.deleteProduct(parseInt(id))
+
+            if (!product) {
+                res.status(404).send({ message: "Product not found" });
+                return
+            }
+
+            if (product.userId !== userId) {
+                res.status(403).send({ message: "You don't have permission to delete this product" });
+                return
+            }
 
             res.status(200).json(product)
         } catch (error) {
