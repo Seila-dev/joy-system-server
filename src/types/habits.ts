@@ -6,7 +6,10 @@ export interface CreateHabit {
   method: HabitMethod;
   frequency: HabitFrequency;
   type: HabitType;
-  duration: number; 
+  duration: number;
+  successPoints: number;
+  failurePoints: number;
+  userId: number;
 }
 
 export interface UpdateHabit {
@@ -16,27 +19,14 @@ export interface UpdateHabit {
   frequency?: HabitFrequency;
   type?: HabitType;
   duration?: number;
+  successPoints?: number;
+  failurePoints?: number;
 }
 
-export interface HabitProgress {
-  isSuccess: boolean; 
-  value?: number; 
-  date?: Date; 
-}
-
-export interface HabitWithProgress extends CreateHabit {
-  id: number;
-  userId: number;
-  createdAt: Date;
-  updatedAt: Date;
-  progress?: HabitProgressDetail[];
-}
-
-export interface HabitProgressDetail {
-  id: number;
+export interface RecordProgress {
   habitId: number;
   isSuccess: boolean;
-  value: number;
-  date: Date;
-  createdAt: Date;
+  value?: number;
+  date?: Date;
+  userId: number;
 }

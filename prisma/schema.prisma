@@ -123,19 +123,20 @@ model Joy {
 }
 
 model JoyTransaction {
-  id          Int                @id @default(autoincrement())
-  userId      Int                @map("user_id")
-  amount      Int
-  type        JoyTransactionType
-  description String
-  createdAt   DateTime           @default(now()) @map("created_at")
-  user        User               @relation(fields: [userId], references: [id])
-  questId     Int?               @map("quest_id")
-  quest       Quest?             @relation(fields: [questId], references: [id])
-  joy         Joy?               @relation(fields: [joyId], references: [id])
-  joyId       Int?               @map("joy_id")
-  purchaseId  Int?               @map("purchase_id")
-  purchase    Purchase?          @relation(fields: [purchaseId], references: [id])
+  id            Int                @id @default(autoincrement())
+  userId        Int                @map("user_id") 
+  amount        Int
+  type          JoyTransactionType
+  description   String
+  createdAt     DateTime           @default(now()) @map("created_at")
+  user          User               @relation(fields: [userId], references: [id])
+  questId       Int?               @map("quest_id")
+  quest         Quest?             @relation(fields: [questId], references: [id])
+  joy           Joy?               @relation(fields: [joyId], references: [id])
+  joyId         Int?               @map("joy_id")
+  purchaseId    Int?               @map("purchase_id")
+  purchase      Purchase?          @relation(fields: [purchaseId], references: [id])
+  habitProgress HabitProgress[]
 
   @@map("joy_transactions")
 }
@@ -191,7 +192,7 @@ model Note {
   content   String       @db.Text
   category  NoteCategory @default(OUTRO)
   status    NoteStatus   @default(ATIVO)
-  priority  Int          @default(0) // 0 = baixa, 1 = média, 2 = alta
+  priority  Int          @default(0) 
   color     String?
   userId    Int          @map("user_id")
   questId   Int?         @map("quest_id")
@@ -204,30 +205,35 @@ model Note {
 }
 
 model HabitProgress {
-  id        Int      @id @default(autoincrement())
-  habitId   Int      @map("habit_id")
-  isSuccess Boolean  @default(true) @map("is_success") // true = conseguiu, false = falhou
-  value     Int      @default(0) // Para hábitos de quantidade
-  date      DateTime @default(now())
-  createdAt DateTime @default(now()) @map("created_at")
-  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  id               Int             @id @default(autoincrement())
+  habitId          Int             @map("habit_id")
+  isSuccess        Boolean         @default(true) @map("is_success")
+  value            Int             @default(0)
+  joyPoints        Int             @default(0) @map("joy_points")
+  date             DateTime        @default(now())
+  createdAt        DateTime        @default(now()) @map("created_at")
+  habit            Habit           @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  joyTransactionId Int?            @map("joy_transaction_id")
+  joyTransaction   JoyTransaction? @relation(fields: [joyTransactionId], references: [id])
 
   @@map("habit_progress")
 }
 
 model Habit {
-  id          Int            @id @default(autoincrement())
-  title       String
-  description String?
-  method      HabitMethod    @default(INSTANTANEO)
-  frequency   HabitFrequency @default(DIARIAMENTE)
-  type        HabitType      @default(BOM)
-  duration    Int           
-  createdAt   DateTime       @default(now()) @map("created_at")
-  updatedAt   DateTime       @updatedAt @map("updated_at")
-  userId      Int            @map("user_id")
-  user        User           @relation(fields: [userId], references: [id])
-  progress    HabitProgress[]
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String?
+  method        HabitMethod     @default(INSTANTANEO)
+  frequency     HabitFrequency  @default(DIARIAMENTE)
+  type          HabitType       @default(BOM)
+  duration      Int // Duração em dias
+  successPoints Int             @default(0) @map("success_points") 
+  failurePoints Int             @default(0) @map("failure_points") 
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  userId        Int             @map("user_id")
+  user          User            @relation(fields: [userId], references: [id])
+  progress      HabitProgress[]
 
   @@map("habits")
 }
