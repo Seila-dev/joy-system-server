@@ -57,6 +57,22 @@ enum NoteStatus {
   FIXADO
 }
 
+enum HabitMethod {
+  INSTANTANEO
+  QUANTIDADE
+}
+
+enum HabitFrequency {
+  DIARIAMENTE
+  SEMANALMENTE
+  MENSALMENTE
+}
+
+enum HabitType {
+  BOM
+  RUIM
+}
+
 model User {
   id             Int              @id @default(autoincrement())
   email          String           @unique
@@ -71,6 +87,7 @@ model User {
   purchases      Purchase[]
   product        Product[]
   notes          Note[]
+  habits         Habit[]
 
   @@map("users")
 }
@@ -168,21 +185,49 @@ model UserProduct {
   @@map("user_products")
 }
 
-
 model Note {
-  id          Int           @id @default(autoincrement())
-  title       String
-  content     String        @db.Text
-  category    NoteCategory  @default(OUTRO)
-  status      NoteStatus    @default(ATIVO)
-  priority    Int           @default(0) // 0 = baixa, 1 = média, 2 = alta
-  color       String?       
-  userId      Int           @map("user_id")
-  questId     Int?          @map("quest_id")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  user        User          @relation(fields: [userId], references: [id])
-  quest       Quest?        @relation(fields: [questId], references: [id])
+  id        Int          @id @default(autoincrement())
+  title     String
+  content   String       @db.Text
+  category  NoteCategory @default(OUTRO)
+  status    NoteStatus   @default(ATIVO)
+  priority  Int          @default(0) // 0 = baixa, 1 = média, 2 = alta
+  color     String?
+  userId    Int          @map("user_id")
+  questId   Int?         @map("quest_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  user      User         @relation(fields: [userId], references: [id])
+  quest     Quest?       @relation(fields: [questId], references: [id])
 
   @@map("notes")
+}
+
+model HabitProgress {
+  id        Int      @id @default(autoincrement())
+  habitId   Int      @map("habit_id")
+  isSuccess Boolean  @default(true) @map("is_success") // true = conseguiu, false = falhou
+  value     Int      @default(0) // Para hábitos de quantidade
+  date      DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@map("habit_progress")
+}
+
+model Habit {
+  id          Int            @id @default(autoincrement())
+  title       String
+  description String?
+  method      HabitMethod    @default(INSTANTANEO)
+  frequency   HabitFrequency @default(DIARIAMENTE)
+  type        HabitType      @default(BOM)
+  duration    Int           
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  userId      Int            @map("user_id")
+  user        User           @relation(fields: [userId], references: [id])
+  progress    HabitProgress[]
+
+  @@map("habits")
 }

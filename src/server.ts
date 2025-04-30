@@ -1,4 +1,5 @@
 import { app } from './app'
+import habitsRoutes from './routes/habits-routes'
 import joyRoutes from './routes/joy-routes'
 import notesRoutes from './routes/notes-routes'
 import productsRoutes from './routes/products-routes'
@@ -17,3 +18,4 @@ app.use("/quests", questsRoutes)
 app.use("/store", productsRoutes)
 app.use("/", joyRoutes)
 app.use("/notes", notesRoutes)
+app.use("/habits", habitsRoutes)
