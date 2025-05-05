@@ -66,12 +66,25 @@ class HabitService {
 
   async recordProgress(data: RecordProgress): Promise<HabitProgress> {
     const { habitId, isSuccess, value = 0, userId, date = new Date() } = data;
-    
+
     const habit = await this.findById(habitId, userId);
 
     const joyPoints = isSuccess ? habit.successPoints : -habit.failurePoints;
 
     return await prisma.$transaction(async (tx) => {
+
+      const existingProgress = await tx.habitProgress.findFirst({
+        where: {
+          habitId,
+          date: new Date(date.toDateString())
+        }
+      });
+
+
+      if (existingProgress) {
+        throw new AppError('Já existe um progresso registrado para esse dia.', 400);
+      }
+
       const progress = await tx.habitProgress.create({
         data: {
           habitId,
@@ -139,11 +152,11 @@ class HabitService {
     await this.findById(habitId, userId);
 
     const dateFilter: { gte?: Date; lte?: Date } = {};
-    
+
     if (startDate) {
       dateFilter['gte'] = startDate;
     }
-    
+
     if (endDate) {
       dateFilter['lte'] = endDate;
     }
@@ -179,21 +192,23 @@ class HabitService {
         habitId
       },
       orderBy: {
-        date: 'desc'
+        date: 'asc'
       }
     });
 
     const totalCompletions = progress.filter(p => p.isSuccess).length;
     const totalFailures = progress.filter(p => !p.isSuccess).length;
-    const completionRate = progress.length > 0 
-      ? (totalCompletions / progress.length) * 100 
+    const completionRate = progress.length > 0
+      ? (totalCompletions / progress.length) * 100
       : 0;
-    
+
     let currentStreak = 0;
-    let i = 0;
-    while (i < progress.length && progress[i].isSuccess) {
-      currentStreak++;
-      i++;
+    for (let i = progress.length - 1; i >= 0; i--) {
+      if (progress[i].isSuccess) {
+        currentStreak++;
+      } else {
+        break;
+      }
     }
 
     let longestStreak = 0;
