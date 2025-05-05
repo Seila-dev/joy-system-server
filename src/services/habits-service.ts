@@ -65,7 +65,10 @@ class HabitService {
   }
 
   async recordProgress(data: RecordProgress): Promise<HabitProgress> {
-    const { habitId, isSuccess, value = 0, userId, date = new Date() } = data;
+    const { habitId, isSuccess, value = 0, userId } = data;
+
+    const date = new Date();
+    date.setUTCHours(0, 0, 0, 0);
 
     const habit = await this.findById(habitId, userId);
 
@@ -155,10 +158,12 @@ class HabitService {
 
     if (startDate) {
       dateFilter['gte'] = startDate;
+      startDate.setUTCHours(0, 0, 0, 0);
     }
 
     if (endDate) {
       dateFilter['lte'] = endDate;
+      endDate.setUTCHours(23, 59, 59, 999); 
     }
 
     const progress = await prisma.habitProgress.findMany({
