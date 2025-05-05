@@ -79,9 +79,8 @@ class HabitService {
       const existingProgress = await tx.habitProgress.findFirst({
         where: {
           habitId,
-          date: new Date(date.toDateString())
-        }
-      });
+          date
+        }})
 
 
       if (existingProgress) {
