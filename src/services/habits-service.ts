@@ -65,41 +65,35 @@ class HabitService {
   }
 
   async recordProgress(data: RecordProgress): Promise<HabitProgress> {
-    const { habitId, isSuccess, value = 0, userId } = data;
-  
+    const { habitId, isSuccess, value = 0, userId, date = new Date() } = data;
+
     const habit = await this.findById(habitId, userId);
-  
-    const now = new Date();
-    const startOfDay = new Date(now);
-    startOfDay.setUTCHours(0, 0, 0, 0);
-    const endOfDay = new Date(now);
-    endOfDay.setUTCHours(23, 59, 59, 999);
-  
+
     const joyPoints = isSuccess ? habit.successPoints : -habit.failurePoints;
-  
+
     return await prisma.$transaction(async (tx) => {
+
       const existingProgress = await tx.habitProgress.findFirst({
         where: {
           habitId,
-          date: {
-            gte: startOfDay,
-            lte: endOfDay
-          }
+          date: new Date(date.toDateString())
         }
       });
-  
+
+
       if (existingProgress) {
         throw new AppError('Já existe um progresso registrado para esse dia.', 400);
       }
-  
+
       const progress = await tx.habitProgress.create({
         data: {
           habitId,
           isSuccess,
           value,
           joyPoints,
-          date: now // ou `now` se quiser registrar a hora real
-        }})
+          date
+        }
+      });
 
       if (joyPoints !== 0) {
         const joyTransaction = await tx.joyTransaction.create({
@@ -161,12 +155,10 @@ class HabitService {
 
     if (startDate) {
       dateFilter['gte'] = startDate;
-      startDate.setUTCHours(0, 0, 0, 0);
     }
 
     if (endDate) {
       dateFilter['lte'] = endDate;
-      endDate.setUTCHours(23, 59, 59, 999); 
     }
 
     const progress = await prisma.habitProgress.findMany({
