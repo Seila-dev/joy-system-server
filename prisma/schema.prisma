@@ -209,6 +209,7 @@ model HabitProgress {
   habitId          Int             @map("habit_id")
   isSuccess        Boolean         @default(true) @map("is_success")
   value            Int             @default(0)
+  notes            String?         @db.Text
   joyPoints        Int             @default(0) @map("joy_points")
   date             DateTime        @default(now())
   createdAt        DateTime        @default(now()) @map("created_at")
@@ -226,7 +227,7 @@ model Habit {
   method        HabitMethod     @default(INSTANTANEO)
   frequency     HabitFrequency  @default(DIARIAMENTE)
   type          HabitType       @default(BOM)
-  duration      Int // Duração em dias
+  duration      Int 
   successPoints Int             @default(0) @map("success_points") 
   failurePoints Int             @default(0) @map("failure_points") 
   createdAt     DateTime        @default(now()) @map("created_at")

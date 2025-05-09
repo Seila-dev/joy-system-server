@@ -110,14 +110,15 @@ class HabitController {
     try {
       const { habitId } = req.params
       const userId = req.user.id
-      const { isSuccess, value, date } = req.body
+      const { isSuccess, value, date, notes } = req.body
 
       const data: RecordProgress = {
         habitId: Number(habitId),
         isSuccess,
         value,
         date: date ? new Date(date) : undefined,
-        userId
+        userId,
+        notes
       };
 
       const progress = await habitService.recordProgress(data)

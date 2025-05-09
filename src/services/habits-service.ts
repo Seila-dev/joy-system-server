@@ -65,7 +65,7 @@ class HabitService {
   }
 
   async recordProgress(data: RecordProgress): Promise<HabitProgress> {
-    const { habitId, isSuccess, value = 0, userId, date = new Date() } = data;
+    const { habitId, isSuccess, notes, value = 0, userId, date = new Date() } = data;
 
     const habit = await this.findById(habitId, userId);
 
@@ -90,6 +90,7 @@ class HabitService {
           habitId,
           isSuccess,
           value,
+          notes,
           joyPoints,
           date
         }

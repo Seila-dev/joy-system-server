@@ -26,6 +26,7 @@ export interface UpdateHabit {
 export interface RecordProgress {
   habitId: number;
   isSuccess: boolean;
+  notes?: string;
   value?: number;
   date?: Date;
   userId: number;
